@@ -86,7 +86,9 @@ export function DownloadButton({
                   {(timestamp.startTime % 60).toString().padStart(2, "0")}
                   {" ~ "}
                   {Math.floor(timestamp.endTime / 60)}:
-                  {(timestamp.endTime % 60).toString().padStart(2, "0")}
+                  {Math.floor(timestamp.endTime % 60)
+                    .toString()
+                    .padStart(2, "0")}
                 </span>
               </div>
             ))}
