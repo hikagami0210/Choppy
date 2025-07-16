@@ -15,6 +15,8 @@ export function DownloadButton({
   disabled = false,
   isProcessing = false,
 }: DownloadButtonProps) {
+  console.log(timestamps, metadata);
+
   const handleClick = () => {
     if (!disabled && !isProcessing) {
       onDownload(timestamps, metadata);

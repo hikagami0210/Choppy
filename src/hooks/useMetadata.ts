@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import type { AudioMetadata } from '../types';
-import { extractMetadata } from '../utils/metadataHandler';
+import { useState, useCallback } from "react";
+import type { AudioMetadata } from "../types";
+import { extractMetadata } from "../utils/metadataHandler";
 
 export function useMetadata() {
   const [metadata, setMetadata] = useState<AudioMetadata | null>(null);
@@ -11,11 +11,15 @@ export function useMetadata() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const extractedMetadata = await extractMetadata(file);
       setMetadata(extractedMetadata);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'メタデータの読み込みに失敗しました');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "メタデータの読み込みに失敗しました"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -31,6 +35,6 @@ export function useMetadata() {
     isLoading,
     error,
     loadMetadata,
-    clearMetadata
+    clearMetadata,
   };
 }

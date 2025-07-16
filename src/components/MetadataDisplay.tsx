@@ -1,4 +1,4 @@
-import type { AudioMetadata } from '../types';
+import type { AudioMetadata } from "../types";
 
 interface MetadataDisplayProps {
   metadata: AudioMetadata | null;
@@ -6,7 +6,11 @@ interface MetadataDisplayProps {
   error: string | null;
 }
 
-export function MetadataDisplay({ metadata, isLoading, error }: MetadataDisplayProps) {
+export function MetadataDisplay({
+  metadata,
+  isLoading,
+  error,
+}: MetadataDisplayProps) {
   if (isLoading) {
     return (
       <div className="bg-gray-50 rounded-lg p-4">
@@ -36,52 +40,60 @@ export function MetadataDisplay({ metadata, isLoading, error }: MetadataDisplayP
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-3">メタデータ情報</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        メタデータ情報
+      </h3>
+
       <div className="flex gap-4">
         {/* アルバムアート */}
         {picture && (
           <div className="flex-shrink-0">
             <img
-              src={`data:${picture.format};base64,${btoa(String.fromCharCode(...picture.data))}`}
+              src={`data:${picture.format};base64,${btoa(
+                String.fromCharCode(...picture.data)
+              )}`}
               alt="アルバムアート"
               className="w-20 h-20 object-cover rounded border border-gray-300"
             />
           </div>
         )}
-        
+
         {/* メタデータ詳細 */}
         <div className="flex-1 space-y-2">
           {hasBasicInfo ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
               {metadata.title && (
                 <div>
-                  <span className="font-medium text-gray-600">タイトル:</span>{' '}
+                  <span className="font-medium text-gray-600">タイトル:</span>{" "}
                   <span className="text-gray-800">{metadata.title}</span>
                 </div>
               )}
               {metadata.artist && (
                 <div>
-                  <span className="font-medium text-gray-600">アーティスト:</span>{' '}
+                  <span className="font-medium text-gray-600">
+                    アーティスト:
+                  </span>{" "}
                   <span className="text-gray-800">{metadata.artist}</span>
                 </div>
               )}
               {metadata.album && (
                 <div>
-                  <span className="font-medium text-gray-600">アルバム:</span>{' '}
+                  <span className="font-medium text-gray-600">アルバム:</span>{" "}
                   <span className="text-gray-800">{metadata.album}</span>
                 </div>
               )}
               {metadata.year && (
                 <div>
-                  <span className="font-medium text-gray-600">年:</span>{' '}
+                  <span className="font-medium text-gray-600">年:</span>{" "}
                   <span className="text-gray-800">{metadata.year}</span>
                 </div>
               )}
               {metadata.genre && metadata.genre.length > 0 && (
                 <div>
-                  <span className="font-medium text-gray-600">ジャンル:</span>{' '}
-                  <span className="text-gray-800">{metadata.genre.join(', ')}</span>
+                  <span className="font-medium text-gray-600">ジャンル:</span>{" "}
+                  <span className="text-gray-800">
+                    {metadata.genre.join(", ")}
+                  </span>
                 </div>
               )}
             </div>

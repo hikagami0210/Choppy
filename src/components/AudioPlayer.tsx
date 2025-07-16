@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { formatTime } from '../utils/timestampParser';
+import React, { useState, useRef, useEffect } from "react";
+import { formatTime } from "../utils/timestampParser";
 
 interface AudioPlayerProps {
   file: File | null;
@@ -13,7 +13,7 @@ export function AudioPlayer({ file, disabled = false }: AudioPlayerProps) {
   const [volume, setVolume] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
@@ -49,20 +49,20 @@ export function AudioPlayer({ file, disabled = false }: AudioPlayerProps) {
     };
 
     const handleError = () => {
-      setError('音声ファイルの読み込みに失敗しました');
+      setError("音声ファイルの読み込みに失敗しました");
       setIsLoading(false);
     };
 
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
       URL.revokeObjectURL(objectURL);
     };
   }, [file]);
@@ -87,7 +87,7 @@ export function AudioPlayer({ file, disabled = false }: AudioPlayerProps) {
     const clickX = e.clientX - rect.left;
     const progress = clickX / rect.width;
     const seekTime = progress * duration;
-    
+
     audio.currentTime = seekTime;
     setCurrentTime(seekTime);
   };
@@ -114,19 +114,19 @@ export function AudioPlayer({ file, disabled = false }: AudioPlayerProps) {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="text-center text-red-700">
-          {error}
-        </div>
+        <div className="text-center text-red-700">{error}</div>
       </div>
     );
   }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-3">音声プレビュー</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        音声プレビュー
+      </h3>
+
       <audio ref={audioRef} preload="metadata" />
-      
+
       <div className="space-y-4">
         {/* 再生コントロール */}
         <div className="flex items-center gap-4">
@@ -135,21 +135,22 @@ export function AudioPlayer({ file, disabled = false }: AudioPlayerProps) {
             disabled={disabled || isLoading}
             className={`
               w-12 h-12 rounded-full flex items-center justify-center text-white text-xl
-              ${disabled || isLoading 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700'
+              ${
+                disabled || isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
               }
             `}
           >
             {isLoading ? (
               <div className="animate-spin text-sm">⟳</div>
             ) : isPlaying ? (
-              '⏸️'
+              "⏸️"
             ) : (
-              '▶️'
+              "▶️"
             )}
           </button>
-          
+
           <div className="flex-1 text-sm text-gray-600">
             <div className="font-medium">{file.name}</div>
             <div className="text-xs text-gray-500">
@@ -166,7 +167,9 @@ export function AudioPlayer({ file, disabled = false }: AudioPlayerProps) {
         >
           <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-100"
-            style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+            style={{
+              width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+            }}
           />
         </div>
 

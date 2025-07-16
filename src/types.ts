@@ -14,7 +14,12 @@ export interface AudioMetadata {
   year?: string;
   genre?: string[];
   picture?: Picture[];
-  [key: string]: string | string[] | Picture[] | { no: number; of: number | null } | undefined;
+  [key: string]:
+    | string
+    | string[]
+    | Picture[]
+    | { no: number; of: number | null }
+    | undefined;
 }
 
 export interface Picture {
@@ -31,26 +36,15 @@ export interface AudioSegment {
   metadata: AudioMetadata;
 }
 
-export interface AppState {
-  file: File | null;
-  originalMetadata: AudioMetadata | null;
-  timestamps: Timestamp[];
-  timestampText: string;
-  segments: AudioSegment[];
-  isProcessing: boolean;
-  progress: number;
-  error: string | null;
-}
-
 export interface ValidationError {
   line: number;
   message: string;
-  type: 'format' | 'overlap' | 'duration' | 'range';
+  type: "format" | "overlap" | "duration" | "range";
 }
 
 export interface ProcessingProgress {
   current: number;
   total: number;
-  stage: 'parsing' | 'loading' | 'splitting' | 'encoding' | 'zipping';
+  stage: "parsing" | "loading" | "splitting" | "encoding" | "zipping";
   message?: string;
 }

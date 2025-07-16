@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { validateFile } from '../utils/validators';
+import { useState, useCallback } from "react";
+import { validateFile } from "../utils/validators";
 
 export function useFileHandler() {
   const [file, setFile] = useState<File | null>(null);
@@ -8,12 +8,12 @@ export function useFileHandler() {
 
   const handleFileSelect = useCallback((selectedFile: File) => {
     const validationErrors = validateFile(selectedFile);
-    
+
     if (validationErrors.length > 0) {
-      setError(validationErrors.map(e => e.message).join('\n'));
+      setError(validationErrors.map((e) => e.message).join("\n"));
       return false;
     }
-    
+
     setFile(selectedFile);
     setError(null);
     return true;
@@ -29,22 +29,28 @@ export function useFileHandler() {
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    if (droppedFiles.length > 0) {
-      handleFileSelect(droppedFiles[0]);
-    }
-  }, [handleFileSelect]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
 
-  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (selectedFiles && selectedFiles.length > 0) {
-      handleFileSelect(selectedFiles[0]);
-    }
-  }, [handleFileSelect]);
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      if (droppedFiles.length > 0) {
+        handleFileSelect(droppedFiles[0]);
+      }
+    },
+    [handleFileSelect]
+  );
+
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedFiles = e.target.files;
+      if (selectedFiles && selectedFiles.length > 0) {
+        handleFileSelect(selectedFiles[0]);
+      }
+    },
+    [handleFileSelect]
+  );
 
   const clearFile = useCallback(() => {
     setFile(null);
@@ -53,12 +59,12 @@ export function useFileHandler() {
 
   const getFileInfo = useCallback(() => {
     if (!file) return null;
-    
+
     return {
       name: file.name,
       size: file.size,
       type: file.type,
-      lastModified: new Date(file.lastModified)
+      lastModified: new Date(file.lastModified),
     };
   }, [file]);
 
@@ -71,6 +77,6 @@ export function useFileHandler() {
     handleDrop,
     handleFileInputChange,
     clearFile,
-    getFileInfo
+    getFileInfo,
   };
 }
