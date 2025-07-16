@@ -5,7 +5,7 @@ import type {
   Timestamp,
   ProcessingProgress,
 } from "../types";
-import { AudioSplitter } from "../utils/audioSplitter";
+import { loadAudioFile, splitAudio, getDuration } from "../utils/audioSplitter";
 import {
   generateZip,
   createDownloadFilename,
@@ -21,21 +21,17 @@ export function useAudioProcessor() {
   const [segments, setSegments] = useState<AudioSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const splitterRef = useRef<AudioSplitter | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const originalFileRef = useRef<File | null>(null);
 
-  const loadAudioFile = useCallback(async (file: File): Promise<boolean> => {
+  const loadAudioFileCallback = useCallback(async (file: File): Promise<boolean> => {
     try {
       setError(null);
       setProcessingStage("loading");
       setProgress(0);
 
-      if (splitterRef.current) {
-        splitterRef.current.destroy();
-      }
-
-      splitterRef.current = new AudioSplitter();
-      audioBufferRef.current = await splitterRef.current.loadAudioFile(file);
+      audioBufferRef.current = await loadAudioFile(file);
+      originalFileRef.current = file;
 
       setProgress(100);
       return true;
@@ -56,7 +52,7 @@ export function useAudioProcessor() {
     ): Promise<void> => {
       setIsProcessing(true);
 
-      if (!splitterRef.current || !audioBufferRef.current) {
+      if (!audioBufferRef.current || !originalFileRef.current) {
         setError("オーディオファイルが読み込まれていません");
         return;
       }
@@ -88,7 +84,9 @@ export function useAudioProcessor() {
         // 音声分割
         setProcessingStage("splitting");
         setProgress(30);
-        const audioSegments = await splitterRef.current.splitAudio(
+        const audioSegments = await splitAudio(
+          audioBufferRef.current,
+          originalFileRef.current,
           timestamps,
           originalMetadata,
           (progress) => {
@@ -132,16 +130,13 @@ export function useAudioProcessor() {
     []
   );
 
-  const getDuration = useCallback((): number => {
-    return audioBufferRef.current ? audioBufferRef.current.duration : 0;
+  const getDurationCallback = useCallback((): number => {
+    return audioBufferRef.current ? getDuration(audioBufferRef.current) : 0;
   }, []);
 
   const cleanup = useCallback(() => {
-    if (splitterRef.current) {
-      splitterRef.current.destroy();
-      splitterRef.current = null;
-    }
     audioBufferRef.current = null;
+    originalFileRef.current = null;
     setSegments([]);
     setProgress(0);
     setError(null);
@@ -153,9 +148,9 @@ export function useAudioProcessor() {
     processingStage,
     segments,
     error,
-    loadAudioFile,
+    loadAudioFile: loadAudioFileCallback,
     processAudio,
-    getDuration,
+    getDuration: getDurationCallback,
     cleanup,
   };
 }
