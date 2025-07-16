@@ -34,6 +34,7 @@ function App() {
     getDuration,
     cleanup,
   } = useAudioProcessor();
+  const audioDuration = getDuration();
 
   // ファイル選択時の処理
   const handleFileSelect = async (selectedFile: File) => {
@@ -55,11 +56,13 @@ function App() {
       return;
     }
 
-    const { timestamps: parsedTimestamps, errors } =
-      parseTimestampText(timestampText);
+    const { timestamps: parsedTimestamps, errors } = parseTimestampText(
+      timestampText,
+      audioDuration
+    );
     setTimestamps(parsedTimestamps);
     setValidationErrors(errors.map((e) => e.message));
-  }, [timestampText]);
+  }, [timestampText, audioDuration]);
 
   // ダウンロードボタンクリック時の処理
   const handleDownload = async (
@@ -80,7 +83,6 @@ function App() {
     cleanup();
   };
 
-  const audioDuration = getDuration();
   const hasValidTimestamps =
     timestamps.length > 0 && validationErrors.length === 0;
 

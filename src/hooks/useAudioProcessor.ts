@@ -54,13 +54,14 @@ export function useAudioProcessor() {
       timestamps: Timestamp[],
       originalMetadata: AudioMetadata | null
     ): Promise<void> => {
+      setIsProcessing(true);
+
       if (!splitterRef.current || !audioBufferRef.current) {
         setError("オーディオファイルが読み込まれていません");
         return;
       }
 
       try {
-        setIsProcessing(true);
         setError(null);
         setProgress(0);
         setSegments([]);
@@ -69,6 +70,7 @@ export function useAudioProcessor() {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         // タイムスタンプの妥当性チェック
+        setProgress(10);
         const duration = audioBufferRef.current.duration;
         const validationErrors = validateTimestampsAgainstDuration(
           timestamps,
@@ -80,29 +82,43 @@ export function useAudioProcessor() {
           return;
         }
 
+        setProgress(20);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         // 音声分割
         setProcessingStage("splitting");
+        setProgress(30);
         const audioSegments = await splitterRef.current.splitAudio(
           timestamps,
           originalMetadata,
           (progress) => {
-            setProgress(progress * 50); // 50%まで
+            console.log("progress", progress);
+
+            setProgress(30 + progress * 40); // 30-70%
           }
         );
 
         setSegments(audioSegments);
+        setProgress(70);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         setProcessingStage("zipping");
+        setProgress(75);
 
         // ZIP生成
         const zipBlob = await generateZip(audioSegments, (progress) => {
-          setProgress(50 + progress * 50); // 50-100%
+          setProgress(75 + progress * 20); // 75-95%
         });
+
+        setProgress(95);
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         // ダウンロード
         const filename = createDownloadFilename();
         downloadBlob(zipBlob, filename);
 
         setProgress(100);
+        await new Promise((resolve) => setTimeout(resolve, 200));
       } catch (err) {
         setError(
           err instanceof Error

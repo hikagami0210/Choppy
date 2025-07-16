@@ -77,7 +77,8 @@ export class AudioSplitter {
       const originalExtension = this.originalFile
         ? getFileExtension(this.originalFile.name)
         : "wav";
-      const filename = sanitizeFilename(timestamp.title) + "." + originalExtension;
+      const filename =
+        sanitizeFilename(timestamp.title) + "." + originalExtension;
 
       let blob: Blob;
       if (originalExtension === "mp3") {

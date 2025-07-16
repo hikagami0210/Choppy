@@ -1,6 +1,9 @@
 import type { Timestamp, ValidationError } from "../types";
 
-export function parseTimestampText(text: string): {
+export function parseTimestampText(
+  text: string,
+  audioDuration: number
+): {
   timestamps: Timestamp[];
   errors: ValidationError[];
 } {
@@ -28,7 +31,7 @@ export function parseTimestampText(text: string): {
   }
 
   // タイムスタンプを補完
-  const completedTimestamps = completeTimestamps(timestamps);
+  const completedTimestamps = completeTimestamps(timestamps, audioDuration);
 
   // バリデーション
   const validationErrors = validateTimestamps(completedTimestamps);
@@ -38,18 +41,29 @@ export function parseTimestampText(text: string): {
 }
 
 function parseTimestampLine(line: string, lineNumber: number): Timestamp {
-  // 基本的なフォーマット: "開始時間 ~ 終了時間 - タイトル" または "~ 終了時間 - タイトル"
-  const match = line.match(
+  // パターン1: "開始時間 ~ 終了時間 - タイトル" または "~ 終了時間 - タイトル"
+  const tildeMatch = line.match(
     /^(?:(\d{1,2}:\d{2}(?::\d{2})?)\s+)?~\s*(?:(\d{1,2}:\d{2}(?::\d{2})?)\s+)?-?\s*(.+)$/
   );
 
-  if (!match) {
+  // パターン2: "開始時間 - タイトル" (終了時刻省略)
+  const dashMatch = line.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s+-\s*(.+)$/);
+
+  let startTimeStr: string | undefined;
+  let endTimeStr: string | undefined;
+  let title: string;
+
+  if (tildeMatch) {
+    [, startTimeStr, endTimeStr, title] = tildeMatch;
+  } else if (dashMatch) {
+    [, startTimeStr, title] = dashMatch;
+    // 開始時刻はそのまま、終了時刻は省略
+    endTimeStr = undefined;
+  } else {
     throw new Error(
-      'タイムスタンプの形式が正しくありません。形式: "開始時間 ~ 終了時間 - タイトル"'
+      'タイムスタンプの形式が正しくありません。形式: "開始時間 ~ 終了時間 - タイトル" または "開始時間 - タイトル"'
     );
   }
-
-  const [, startTimeStr, endTimeStr, title] = match;
 
   const startTime = startTimeStr ? parseTimeString(startTimeStr) : null;
   const endTime = endTimeStr ? parseTimeString(endTimeStr) : null;
@@ -86,7 +100,10 @@ function parseTimeString(timeStr: string): number {
   );
 }
 
-function completeTimestamps(timestamps: Timestamp[]): Timestamp[] {
+function completeTimestamps(
+  timestamps: Timestamp[],
+  audioDuration: number
+): Timestamp[] {
   const completed = [...timestamps];
 
   for (let i = 0; i < completed.length; i++) {
@@ -98,10 +115,24 @@ function completeTimestamps(timestamps: Timestamp[]): Timestamp[] {
     }
 
     // 終了時間が省略されている場合
-    if (current.isEndOmitted && i < completed.length - 1) {
-      current.endTime = completed[i + 1].startTime;
+    if (current.isEndOmitted) {
+      if (i < completed.length - 1) {
+        // 次のセグメントがある場合は、次のセグメントの開始時刻を使用
+        current.endTime = completed[i + 1].startTime;
+      } else {
+        console.log(
+          "else",
+          audioDuration,
+          audioDuration || current.startTime + 180
+        );
+
+        // 最後のセグメントの場合は、音声ファイルの最後まで
+        current.endTime = audioDuration; // 音声の長さがない場合は3分
+      }
     }
   }
+
+  console.log("completed", completed);
 
   return completed;
 }

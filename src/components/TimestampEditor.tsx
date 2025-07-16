@@ -21,8 +21,8 @@ export function TimestampEditor({
     if (!value.trim()) {
       return { timestamps: [], errors: [] };
     }
-    return parseTimestampText(value);
-  }, [value]);
+    return parseTimestampText(value, audioDuration);
+  }, [audioDuration, value]);
 
   const formatDuration = useCallback((seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
