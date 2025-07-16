@@ -64,6 +64,9 @@ export function useAudioProcessor() {
         setError(null);
         setProgress(0);
         setSegments([]);
+        setProcessingStage("parsing");
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         // タイムスタンプの妥当性チェック
         const duration = audioBufferRef.current.duration;
