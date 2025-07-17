@@ -40,7 +40,16 @@ export function DownloadButton({
       >
         {isProcessing ? (
           <div className="flex items-center justify-center gap-2">
-            <div className="animate-spin">⟳</div>
+            <img
+              className=" animate-spin"
+              src="src/assets/loading.png"
+              alt="loading"
+              style={{
+                height: "24px",
+                width: "24px",
+                filter: "grayscale(100%)",
+              }}
+            />
             処理中...
           </div>
         ) : (
