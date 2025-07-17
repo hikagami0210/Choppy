@@ -195,7 +195,7 @@ function App() {
         <div className="text-center mt-12 py-6 text-sm text-gray-500">
           <p>Choppy - 音声ファイル分割ツール</p>
           <p className="mt-1">
-            完全クライアントサイド処理。サーバーにファイルは送信されません。
+            ブラウザで処理を行います。サーバーにファイルは送信されません。
           </p>
         </div>
       </div>
