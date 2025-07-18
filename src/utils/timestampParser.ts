@@ -1,5 +1,9 @@
 import type { Timestamp, ValidationError } from "../types";
 
+export const REGEX_TIMESTAMP = /^(?:([^\s~]+)\s+)?~\s*(?:([^\s~]+)\s+)?(.*)$/;
+
+export const REGEX_TIMESTAMP_WITH_DASH = /^([^\s~]+)\s+(.*)$/;
+
 export function parseTimestampText(
   text: string,
   audioDuration: number
@@ -40,14 +44,15 @@ export function parseTimestampText(
   return { timestamps: completedTimestamps, errors };
 }
 
-function parseTimestampLine(line: string, lineNumber: number): Timestamp {
+export const parseTimestampLine = (
+  line: string,
+  lineNumber: number
+): Timestamp => {
   // パターン1: "開始時間 ~ 終了時間 - タイトル" または "~ 終了時間 - タイトル"
-  const tildeMatch = line.match(
-    /^(?:(\d{1,2}:\d{2}(?::\d{2})?)\s+)?~\s*(?:(\d{1,2}:\d{2}(?::\d{2})?)\s+)?-?\s*(.+)$/
-  );
+  const tildeMatch = line.match(REGEX_TIMESTAMP);
 
   // パターン2: "開始時間 - タイトル" (終了時刻省略)
-  const dashMatch = line.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s+-\s*(.+)$/);
+  const dashMatch = line.match(REGEX_TIMESTAMP_WITH_DASH);
 
   let startTimeStr: string | undefined;
   let endTimeStr: string | undefined;
@@ -65,10 +70,22 @@ function parseTimestampLine(line: string, lineNumber: number): Timestamp {
     );
   }
 
+  // 時間文字列が有効な形式かチェック
+  if (startTimeStr && !isValidTimeFormat(startTimeStr)) {
+    throw new Error(
+      "時間形式が正しくありません。MM:SS または HH:MM:SS 形式で入力してください"
+    );
+  }
+  if (endTimeStr && !isValidTimeFormat(endTimeStr)) {
+    throw new Error(
+      "時間形式が正しくありません。MM:SS または HH:MM:SS 形式で入力してください"
+    );
+  }
+
   const startTime = startTimeStr ? parseTimeString(startTimeStr) : null;
   const endTime = endTimeStr ? parseTimeString(endTimeStr) : null;
 
-  if (!title.trim()) {
+  if (!title || !title.trim()) {
     throw new Error("タイトルが指定されていません");
   }
 
@@ -80,10 +97,21 @@ function parseTimestampLine(line: string, lineNumber: number): Timestamp {
     isStartOmitted: !startTimeStr,
     isEndOmitted: !endTimeStr,
   };
+};
+
+function isValidTimeFormat(timeStr: string): boolean {
+  return /^\d{1,2}:\d{2}(?::\d{2})?$/.test(timeStr);
 }
 
 function parseTimeString(timeStr: string): number {
   const parts = timeStr.split(":").map(Number);
+
+  // NaNが含まれていないかチェック
+  if (parts.some(isNaN)) {
+    throw new Error(
+      "時間形式が正しくありません。MM:SS または HH:MM:SS 形式で入力してください"
+    );
+  }
 
   if (parts.length === 2) {
     // MM:SS
