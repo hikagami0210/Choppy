@@ -91,7 +91,14 @@ function App() {
       <div className="max-w-4xl mx-auto p-6">
         {/* ヘッダー */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">🎵 Choppy</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
+            <img
+              src="/image.png"
+              alt="Choppy"
+              style={{ width: "64px", height: "64px" }}
+            />
+            Choppy
+          </h1>
           <p className="text-gray-600">
             音声ファイルをタイムスタンプで分割してダウンロード
           </p>
